@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <iostream>
 #include <utility>
+#include <string.h>
+#include <algorithm>
 
 using namespace std;
 
@@ -23,7 +25,7 @@ inline int mapping( const char*  _word ){
   return (int)_h;
 }
 
-inline WordDistrib normalize( WordsDistrib _dist ){
+inline WordsDistrib normalize( WordsDistrib _dist ){
   WordsDistrib _newdist;
   sort( _dist.begin() , _dist.end() );
   for( size_t l = 0 , r = 0 ; l < _dist.size() ; l = r ){
@@ -50,9 +52,9 @@ inline void standardize(){
 }
 
 inline WordsDistrib read( const char* path ){
-  WordDistrib _dist;
+  WordsDistrib _dist;
   
-  FILE *fin = fopen( path );
+  FILE *fin = fopen( path , "r" );
   
   while( fscanf( fin , "%s" , input ) == 1 ){
     standardize();
