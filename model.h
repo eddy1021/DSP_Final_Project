@@ -27,7 +27,7 @@ public:
     int _hsh;
     double _vl;
     while( fscanf( fin , "%d%lf" , &_hsh , &_vl ) == 2 )
-      para.push_back( { _hsh , prob( _vl ) } );
+      para.push_back( make_pair( _hsh , prob( _vl ) ) );
 
     fclose( fin );
     return loaded = true;

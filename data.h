@@ -30,7 +30,7 @@ inline WordsDistrib normalize( WordsDistrib _dist ){
   sort( _dist.begin() , _dist.end() );
   for( size_t l = 0 , r = 0 ; l < _dist.size() ; l = r ){
     while( r < _dist.size() && _dist[ l ].Word == _dist[ r ].Word ) r ++;
-    _newdist.push_back( { _dist[ l ].Word , r - l } );
+    _newdist.push_back( make_pair( _dist[ l ].Word , r - l ) );
   }
   return _newdist;
 }
@@ -60,7 +60,7 @@ inline WordsDistrib read( const char* path ){
     standardize();
     if( strlen( input ) == 0 ) continue;
     int _hsh = mapping( input );
-    _dist.push_back( { _hsh , 1 } );
+    _dist.push_back( make_pair( _hsh , 1 ) );
   }
 
   fclose( fin );
