@@ -6,17 +6,24 @@
 #include <utility>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#include <iostream>
+#include <fstream>
+using namespace std;
 
 #define ModelNum 20
 #define TopicNum 3
-int PenaltyOOV = 0;
+double Threshold = 0.00001;
+int PenaltyOOV = 10;
 
 void init();
+bool isGood( char* );
 vector< char* > testModel( const char* fileName );
 vector< pair< int, double > > transform( WordsDistrib& );
 double calProb( vector< pair< int, double > >&, int );
 double cost( double, double );
 void output();
+void acc();
 
 Model m[ ModelNum ];
 char modelName[ ][ 20 ] = { "atheism",
@@ -44,8 +51,31 @@ vector< vector< char* > > ansM;
 
 int main( int argc, char* argv[ ] ) {
   init();
-  PenaltyOOV = atoi( argv[ 2 ] );
+  if ( argc != 1 ) {
+    if( strcmp( "-penalty" , argv[ 1 ] ) ) {
+      puts( "USAGE: ./test [ -penalty #NUM ] [ -threshold #NUM ]" ); 
+      exit(0);
+    }
+    if ( argc >= 3 && !isGood( argv[ 2 ] ) ) {
+      printf( "%s is not a number!\n", argv[ 2 ] );
+      exit(0);
+    }
+    else 
+      PenaltyOOV = atoi( argv[ 2 ] );
+    if ( argc >= 5 && strcmp( "-threshold", argv[ 3 ] ) ) {
+      puts( "USAGE: ./test [ -penalty #NUM ] [ -threshold #NUM ]" ); 
+      exit(0);
+    }
+    if ( argc >= 5 && !isGood( argv[ 4 ] ) ) {
+      printf( "%s is not a number!\n", argv[ 4 ] );
+      exit(0);
+    }
+    else 
+      Threshold = atof( argv[ 4 ] );
+  }
 
+  clock_t start, end;
+  start = clock();
   FILE* fin1 = fopen( "filelist_test/filelist.list", "r" );
 
   char list[ 100 ];
@@ -63,6 +93,10 @@ int main( int argc, char* argv[ ] ) {
 
   output();
   fclose( fin1 );
+  
+  end = clock();
+  cout << ( double )( end - start ) / CLOCKS_PER_SEC << "(s)/";
+  acc();
 }
 
 void init() {
@@ -71,6 +105,14 @@ void init() {
     sprintf( fname, "models/model_%02d.mod", i );
     m[ i ].load( fname );
   }
+}
+
+bool isGood( char* c ) {
+  int len = strlen( c );
+  for ( int i = 0 ; i < len ; ++i )
+    if ( ( c[ i ] < '0' || c[ i ] > '9' ) && c[ i ] != '.' )
+      return false;
+  return true;
 }
 
 vector< char* > testModel( const char* fileName ) {
@@ -110,8 +152,11 @@ double calProb( vector< pair< int, double > >& data, int index ) {
     }
     else {
       while ( im < cm.para.size() && 
-              data[ i ].Word > cm.para[ im ].Word ) {
-        ans += cost( cm.para[ im ].second.value(), 0 ) * PenaltyOOV;
+              data[ i ].Word > cm.para[ im ].Word ) { 
+        if ( cm.para[ im ].second.value() > Threshold )
+          ans += cost( cm.para[ im ].second.value(), 0 ) * PenaltyOOV;
+        else 
+          ans += cost( cm.para[ im ].second.value(), 0 );
         ++im;
       }
       if ( im < cm.para.size() && data[ i ].Word == cm.para[ im ].Word ) {
@@ -144,3 +189,19 @@ void output() {
   fclose( fout );
 }
 
+void acc() {
+  ifstream ifs( "analysis.out" );
+  string temp, target;
+  double count = 0, success = 0;
+  while ( getline( ifs, target, ' ' ) ) {
+    ++count;
+    for ( int i = 0 ; i < 3 ; ++i ) {
+      getline( ifs, temp, ' ' );
+      if ( strstr( target.c_str(), temp.c_str() ) != NULL ) {
+        ++success;
+      }
+    }
+  }
+
+  cout << success / count * 100 << "%" << endl;
+}
