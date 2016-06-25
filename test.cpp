@@ -109,17 +109,17 @@ double calProb( vector< pair< int, double > >& data, int index ) {
       ++im;
     }
     else {
-      while ( ( im + 1 ) < cm.para.size() && 
+      while ( im < cm.para.size() && 
               data[ i ].Word > cm.para[ im ].Word ) {
         ans += cost( cm.para[ im ].second.value(), 0 ) * PenaltyOOV;
         ++im;
       }
-      if ( data[ i ].Word != cm.para[ im ].Word )
-        ans += ( cost( data[ i ].second, 0 ) + 
-                 cost( cm.para[ im ].second.value(), 0 ) ) * PenaltyOOV;
-      else
+      if ( im < cm.para.size() && data[ i ].Word == cm.para[ im ].Word ) {
         ans += cost( data[ i ].second, cm.para[ im ].second.value() );
-      ++im;
+        ++im;
+      }
+      else  
+        ans += cost( data[ i ].second, 0 ) * PenaltyOOV;
     }
   }
   return ans;
