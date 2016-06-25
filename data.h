@@ -16,6 +16,7 @@ typedef vector< pair<int,int> > WordsDistrib;
 
 #define BS 13131
 #define mod 1000000007
+#define TOO_SHORT 2
 
 inline int mapping( const char*  _word ){
   int len = strlen( _word );
@@ -58,7 +59,7 @@ inline WordsDistrib read( const char* path ){
   
   while( fscanf( fin , "%s" , input ) == 1 ){
     standardize();
-    if( strlen( input ) == 0 ) continue;
+    if( strlen( input ) <= TOO_SHORT ) continue;
     int _hsh = mapping( input );
     _dist.push_back( make_pair( _hsh , 1 ) );
   }
