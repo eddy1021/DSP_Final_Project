@@ -124,7 +124,7 @@ double calProb( vector< pair< int, double > >& data, int index ) {
       ++im;
     }
     else {
-      ans = ans + data[ i ].second * data[ i ].second * 100;
+      ans = ans + data[ i ].second * data[ i ].second * 5000;
       ++im;
     }
   }
