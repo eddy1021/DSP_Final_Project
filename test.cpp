@@ -8,6 +8,9 @@
 #include <iostream>
 using namespace std;
 
+#define ModelNum 20
+#define PenaltyOOV 5000
+#define TopicNum 3
 
 void init();
 vector< char* > testModel( const char* fileName );
@@ -15,28 +18,8 @@ vector< pair< int, double > > transform( WordsDistrib& );
 double calProb( vector< pair< int, double > >&, int );
 void output();
 
-Model m[ 21 ];
-char inputFile[ ][ 21 ] = {  "models/model_00.mod",
-                             "models/model_01.mod",
-                             "models/model_02.mod",
-                             "models/model_03.mod",
-                             "models/model_04.mod",
-                             "models/model_05.mod",
-                             "models/model_06.mod",
-                             "models/model_07.mod",
-                             "models/model_08.mod",
-                             "models/model_09.mod",
-                             "models/model_10.mod",
-                             "models/model_11.mod",
-                             "models/model_12.mod",
-                             "models/model_13.mod",
-                             "models/model_14.mod",
-                             "models/model_15.mod",
-                             "models/model_16.mod",
-                             "models/model_17.mod",
-                             "models/model_18.mod",
-                             "models/model_19.mod"};
-char modelName[ ][ 21 ] = { "atheism",
+Model m[ ModelNum ];
+char modelName[ ][ 20 ] = { "atheism",
                             "autos",
                             "baseball",
                             "christian",
@@ -81,20 +64,23 @@ int main() {
 }
 
 void init() {
-  for ( int i = 0 ; i < 21 ; ++i )
-    m[ i ].load( inputFile[ i ] );
+  char fname[ 100 ];
+  for ( int i = 0 ; i < ModelNum ; ++i ) {
+    sprintf( fname, "models/model_%d.mod", i );
+    m[ i ].load( fname );
+  }
 }
 
 vector< char* > testModel( const char* fileName ) {
   WordsDistrib tdb = read( fileName );
   vector< pair< int, double > > temp = transform( tdb );
   vector< pair< double, char* > > ta;
-  for ( int i = 0 ; i < 20 ; ++i ) 
+  for ( int i = 0 ; i < ModelNum ; ++i ) 
     ta.push_back( make_pair( calProb( temp, i ), modelName[ i ] ) );
   
   sort( ta.begin(), ta.end() );
   vector< char* > ans;
-  for ( size_t i = 0 ; i < 3 ; ++i )  
+  for ( size_t i = 0 ; i < TopicNum ; ++i )  
     ans.push_back( ta[ i ].second );
   return ans;
 }
@@ -110,23 +96,26 @@ vector< pair< int, double > > transform( WordsDistrib& data ) {
 }
 
 double calProb( vector< pair< int, double > >& data, int index ) {
-  Model cm = m[ index ];
+  Model& cm = m[ index ];
   double ans = 0;
-  for ( size_t i = 0, im = 0 ; i < data.size() ; ++i ) {
+  size_t im = 0;
+  for ( size_t i = 0 ; i < data.size() ; ++i ) {
     while ( ( im + 1 ) < cm.para.size() && 
             data[ i ].Word > cm.para[ im ].Word )
       ++im;
     if ( im >= cm.para.size() || data[ i ].Word < cm.para[ im ].Word )
-      ans = ans + data[ i ].second * data[ i ].second;
+      ans = ans + data[ i ].second * data[ i ].second * PenaltyOOV;
     else if ( data[ i ].Word == cm.para[ im ].Word ) {
       ans = ans + ( data[ i ].second - cm.para[ im ].second.value() ) *
                   ( data[ i ].second - cm.para[ im ].second.value() );
       ++im;
     }
+/*
     else {
       ans = ans + data[ i ].second * data[ i ].second * 5000;
       ++im;
     }
+*/
   }
   return ans;
 }
