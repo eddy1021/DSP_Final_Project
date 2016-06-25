@@ -122,6 +122,8 @@ double calProb( vector< pair< int, double > >& data, int index ) {
         ans += cost( data[ i ].second, 0 ) * PenaltyOOV;
     }
   }
+  for ( ; im < cm.para.size() ; ++im )
+    ans += cost( cm.para[ im ].second.value(), 0 ) * PenaltyOOV;
   return ans;
 }
 
