@@ -19,7 +19,7 @@ typedef vector< pair<int,int> > WordsDistrib;
 
 inline int mapping( const char*  _word ){
   int len = strlen( _word );
-  long long _h;
+  long long _h = 0;
   for( int _ = 0 ; _ < len ; _ ++ )
     _h = ( _h * BS + ( _word[ _ ] + 128 ) ) % mod;
   return (int)_h;
