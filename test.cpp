@@ -68,7 +68,7 @@ int main( int argc, char* argv[ ] ) {
 void init() {
   char fname[ 100 ];
   for ( int i = 0 ; i < ModelNum ; ++i ) {
-    sprintf( fname, "models/model_%d.mod", i );
+    sprintf( fname, "models/model_%02d.mod", i );
     m[ i ].load( fname );
   }
 }
