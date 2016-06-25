@@ -65,7 +65,8 @@ void merge( WordsDistrib& data, WordsDistrib& give ) {
     data = give;
   else {
     WordsDistrib temp;
-    for ( size_t i = 0, ig = 0  ; i < data.size() ; ++i ) {
+    size_t ig = 0;
+    for ( size_t i = 0 ; i < data.size() ; ++i ) {
       if ( ig >= give.size() || data[ i ].Word < give[ ig ].Word )
         temp.push_back( make_pair( data[ i ].Word, data[ i ].Count ) );
       else if ( data[ i ].Word == give[ ig ].Word ) { 
@@ -73,10 +74,15 @@ void merge( WordsDistrib& data, WordsDistrib& give ) {
         ++ig;
       }
       else {
-        temp.push_back( make_pair( give[ ig ].Word, give[ ig ].Count ) );
-        ++ig;
+        while ( data[ i ].Word > give[ ig ].Word && ig < give.size() ) {
+          temp.push_back( make_pair( give[ ig ].Word, give[ ig ].Count ) );
+          ++ig;
+        }
+        temp.push_back( data[ i ] );
       }
     }
+    for ( ; ig < give.size() ; ++ig ) 
+      temp.push_back( give[ ig ] );
     data = temp;
   }
 }
