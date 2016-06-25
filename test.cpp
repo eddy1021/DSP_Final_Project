@@ -5,17 +5,17 @@
 #include <vector>
 #include <utility>
 #include <stdio.h>
-#include <iostream>
-using namespace std;
+#include <stdlib.h>
 
 #define ModelNum 20
-#define PenaltyOOV 5000
 #define TopicNum 3
+int PenaltyOOV = 0;
 
 void init();
 vector< char* > testModel( const char* fileName );
 vector< pair< int, double > > transform( WordsDistrib& );
 double calProb( vector< pair< int, double > >&, int );
+double cost( double, double );
 void output();
 
 Model m[ ModelNum ];
@@ -42,8 +42,10 @@ char modelName[ ][ 20 ] = { "atheism",
 vector< string > ansF;
 vector< vector< char* > > ansM;
 
-int main() {
+int main( int argc, char* argv[ ] ) {
   init();
+  PenaltyOOV = atoi( argv[ 2 ] );
+
   FILE* fin1 = fopen( "filelist_test/filelist.list", "r" );
 
   char list[ 100 ];
@@ -100,24 +102,20 @@ double calProb( vector< pair< int, double > >& data, int index ) {
   double ans = 0;
   size_t im = 0;
   for ( size_t i = 0 ; i < data.size() ; ++i ) {
-    while ( ( im + 1 ) < cm.para.size() && 
-            data[ i ].Word > cm.para[ im ].Word )
+    while ( ( im + 1 ) < cm.para.size() && data[ i ].Word > cm.para[ im ].Word )
       ++im;
     if ( im >= cm.para.size() || data[ i ].Word < cm.para[ im ].Word )
-      ans = ans + data[ i ].second * data[ i ].second * PenaltyOOV;
+      ans = ans + cost( data[ i ].second, 0 ) * PenaltyOOV;
     else if ( data[ i ].Word == cm.para[ im ].Word ) {
-      ans = ans + ( data[ i ].second - cm.para[ im ].second.value() ) *
-                  ( data[ i ].second - cm.para[ im ].second.value() );
+      ans = ans + cost( data[ i ].second, cm.para[ im ].second.value() );
       ++im;
     }
-/*
-    else {
-      ans = ans + data[ i ].second * data[ i ].second * 5000;
-      ++im;
-    }
-*/
   }
   return ans;
+}
+
+double cost( double a, double b ) {
+  return ( a - b ) * ( a - b );
 }
 
 void output() {
