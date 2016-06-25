@@ -19,7 +19,7 @@ int main() {
   char list[ 100 ], fname[ 100 ];
   while ( fscanf( fin, "%s", list ) != EOF ) { 
     initModel( m, list );
-    sprintf( fname, "models/model_%d.mod", index++ );
+    sprintf( fname, "models/model_%02d.mod", index++ );
     m.write( fname );
   }
 
@@ -53,11 +53,19 @@ void merge( WordsDistrib& data, WordsDistrib& give ) {
         ++ig;
       }
       else {
-        while ( data[ i ].Word > give[ ig ].Word && ig < give.size() ) {
-          temp.push_back( make_pair( give[ ig ].Word, give[ ig ].Count ) );
+        while ( ( ig + 1 ) < give.size() && data[ i ].Word > give[ ig ].Word ) {
+          temp.push_back( give[ ig ] );
           ++ig;
         }
-        temp.push_back( data[ i ] );
+        if ( data[ i ].Word < give[ ig ].Word )
+          temp.push_back( data[ i ] );
+        else if ( data[ i ].Word == give[ ig ].Word ) 
+          temp.push_back( make_pair( data[ i ].Word, data[ i ].Count + give[ ig ].Count ) );
+        else { 
+          temp.push_back( give[ ig ] );
+          temp.push_back( data[ i ] );
+        }
+        ++ig;
       }
     }
     for ( ; ig < give.size() ; ++ig ) 
