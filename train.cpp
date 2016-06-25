@@ -30,8 +30,7 @@ char outputFile[ ][ 21 ] = { "models/model_00.mod",
                              "models/model_16.mod",
                              "models/model_17.mod",
                              "models/model_18.mod",
-                             "models/model_19.mod",
-                             "models/model_20.mod" };
+                             "models/model_19.mod" };
 
 int main() {
   FILE* fin = fopen( "filelist_train/filelist.list", "r" );

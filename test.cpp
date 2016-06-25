@@ -35,29 +35,27 @@ char inputFile[ ][ 21 ] = {  "models/model_00.mod",
                              "models/model_16.mod",
                              "models/model_17.mod",
                              "models/model_18.mod",
-                             "models/model_19.mod",
-                             "models/model_20.mod" };
-char modelName[ ][ 21 ] = { "model_00",
-                            "model_01",
-                            "model_02",
-                            "model_03",
-                            "model_04",
-                            "model_05",
-                            "model_06",
-                            "model_07",
-                            "model_08",
-                            "model_09",
-                            "model_10",
-                            "model_11",
-                            "model_12",
-                            "model_13",
-                            "model_14",
-                            "model_15",
-                            "model_16",
-                            "model_17",
-                            "model_18",
-                            "model_19",
-                            "model_20" };
+                             "models/model_19.mod"};
+char modelName[ ][ 21 ] = { "atheism",
+                            "autos",
+                            "baseball",
+                            "christian",
+                            "crypt",
+                            "eletronics",
+                            "forsale",
+                            "graphics",
+                            "guns",
+                            "hockey",
+                            "ibm.pc.hardware",
+                            "mac.hardware",
+                            "med",
+                            "mideast",
+                            "motorcycles",
+                            "ms-windows.misc",
+                            "politics",
+                            "religion",
+                            "space",
+                            "windows.x" };
 vector< string > ansF;
 vector< vector< char* > > ansM;
 
@@ -91,7 +89,7 @@ vector< char* > testModel( const char* fileName ) {
   WordsDistrib tdb = read( fileName );
   vector< pair< int, double > > temp = transform( tdb );
   vector< pair< double, char* > > ta;
-  for ( int i = 0 ; i < 21 ; ++i ) 
+  for ( int i = 0 ; i < 20 ; ++i ) 
     ta.push_back( make_pair( calProb( temp, i ), modelName[ i ] ) );
   
   sort( ta.begin(), ta.end() );
@@ -126,7 +124,7 @@ double calProb( vector< pair< int, double > >& data, int index ) {
       ++im;
     }
     else {
-      ans = ans + data[ i ].second * data[ i ].second;
+      ans = ans + data[ i ].second * data[ i ].second * 100;
       ++im;
     }
   }
