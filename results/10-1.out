@@ -1,0 +1,2 @@
+./test -penalty 10 -threshold 1e-06
+14.641(s)/92.9776%

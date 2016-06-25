@@ -1,0 +1,2 @@
+./test -penalty 10 -threshold 0.001
+14.575(s)/92.9245%
