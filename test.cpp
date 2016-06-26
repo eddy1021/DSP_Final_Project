@@ -15,6 +15,8 @@ using namespace std;
 #define TopicNum 3
 double Threshold = 0.00001;
 int PenaltyOOV = 10;
+int lowerbound = 0;
+int upperbound = 255;
 
 void init();
 bool isGood( char* );
@@ -49,30 +51,48 @@ char modelName[ ][ 20 ] = { "atheism",
 vector< string > ansF;
 vector< vector< char* > > ansM;
 
+char USAGE[] = "USAGE: ./test -default\n       ./test [ -penalty #NUM ] [ -threshold #NUM ] [ -wordLen #lowerbound #upperbound ]";
+
+inline void Exit( const char* msg = USAGE ){
+  cerr << msg << endl;
+  exit( 0 );
+}
+
+inline bool isN( const char* token ){
+  int len = strlen( token );
+  for( int i = 0 ; i < len ; i ++ )
+    if( !isdigit( token[ i ] ) )
+      return false;
+  return true;
+}
+
 int main( int argc, char* argv[ ] ) {
-  init();
-  if ( argc != 1 ) {
-    if( strcmp( "-penalty" , argv[ 1 ] ) ) {
-      puts( "USAGE: ./test [ -penalty #NUM ] [ -threshold #NUM ]" ); 
-      exit(0);
-    }
-    if ( argc >= 3 && !isGood( argv[ 2 ] ) ) {
-      printf( "%s is not a number!\n", argv[ 2 ] );
-      exit(0);
-    }
-    else 
-      PenaltyOOV = atoi( argv[ 2 ] );
-    if ( argc >= 5 && strcmp( "-threshold", argv[ 3 ] ) ) {
-      puts( "USAGE: ./test [ -penalty #NUM ] [ -threshold #NUM ]" ); 
-      exit(0);
-    }
-    if ( argc >= 5 && !isGood( argv[ 4 ] ) ) {
-      printf( "%s is not a number!\n", argv[ 4 ] );
-      exit(0);
-    }
-    else 
-      Threshold = atof( argv[ 4 ] );
+  if( argc == 1 ) Exit();
+  for( int i = 1 ; i < argc ; ){
+    if( strcmp( argv[ i ] , "-penalty" ) == 0 ){
+      if( i + 1 >= argc || !isN( argv[ i + 1 ] ) )
+        Exit( "Expected a positive integer after -penalty" );
+      PenaltyOOV = atoi( argv[ i + 1 ] );
+      i += 2;
+    }else if( strcmp( argv[ i ] , "-threshold" ) == 0 ){
+      if( i + 1 >= argc || !isGood( argv[ i + 1 ] ) )
+        Exit( "Expected a positive real number after -threshold" );
+      Threshold = atof( argv[ i + 1 ] );
+      i += 2;
+    }else if( strcmp( argv[ i ] , "-wordLen" ) == 0 ){
+      if( i + 2 >= argc || !isN( argv[ i + 1 ] ) || !isN( argv[ i + 2 ] ) )
+        Exit( "Expected two positive integer after -wordLen" );
+      lowerbound = atoi( argv[ i + 1 ] );
+      upperbound = atoi( argv[ i + 2 ] );
+      if( lowerbound > upperbound )
+        Exit( "lowerbound <= upperbound should be satisfied" );
+      i += 3;
+    }else if( strcmp( argv[ i ] , "-default" ) == 0 && i == 1 && i + 1 == argc )
+      break;
+    else Exit();
   }
+
+  init();
 
   clock_t start, end;
   start = clock();
@@ -116,7 +136,7 @@ bool isGood( char* c ) {
 }
 
 vector< char* > testModel( const char* fileName ) {
-  WordsDistrib tdb = read( fileName );
+  WordsDistrib tdb = read( fileName , lowerbound , upperbound );
   vector< pair< int, double > > temp = transform( tdb );
   vector< pair< double, char* > > ta;
   for ( int i = 0 ; i < ModelNum ; ++i ) 

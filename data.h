@@ -16,7 +16,8 @@ typedef vector< pair<int,int> > WordsDistrib;
 
 #define BS 13131
 #define mod 1000000007
-#define TOO_SHORT 2
+#define wordRangeL 0
+#define wordRangeR 255
 
 inline int mapping( const char*  _word ){
   int len = strlen( _word );
@@ -52,14 +53,16 @@ inline void standardize(){
     input[ i ] = tmp[ i ];
 }
 
-inline WordsDistrib read( const char* path ){
+inline WordsDistrib read( const char* path , const int rangel = wordRangeL ,
+                                             const int ranger = wordRangeR ){
   WordsDistrib _dist;
   
   FILE *fin = fopen( path , "r" );
   
   while( fscanf( fin , "%s" , input ) == 1 ){
     standardize();
-    if( strlen( input ) <= TOO_SHORT ) continue;
+    int len = strlen( input );
+    if( len < rangel || len > ranger ) continue;
     int _hsh = mapping( input );
     _dist.push_back( make_pair( _hsh , 1 ) );
   }
