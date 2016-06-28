@@ -1,14 +1,14 @@
-# TODO list
+# USAGE
 
-## required files
-- data.h
-- model.h
-- prob.h
+## Set up
+- unzip DSP\_Final\_Project.zip
+- make all
 
-## build each model
-- calculate the parameters of the model
-- write it out to the file
+## Build models
+- ./train -default
+- ./train -wordLen \#rangel \#ranger
 
-## test model with data
-- read all the trained data
-- output the most probable topic of it
+## Test datas
+- ./test -default
+- ./test \[-penalty \#penalty\] \[-threshold \#threshold\] \[-wordLen \#rangel \#ranger\]
+
